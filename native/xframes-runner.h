@@ -24,6 +24,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "callbacks-handler.h"
 #include "xframes-runner.h"
 
 using json = nlohmann::json;
@@ -37,10 +38,24 @@ typedef void (*OnMultipleNumericValuesChangedCb)(int, float*, int numValues);
 typedef void (*OnClickCb)(int);
 
 template <typename T>
-std::vector<T> JsonToVector(std::string& data);
+std::vector<T> JsonToVector(std::string& data) {
+    auto parsedData = json::parse(data);
+    std::vector<T> vec;
+    for (auto& [key, item] : parsedData.items()) {
+        vec.push_back(item.template get<T>());
+    }
+    return vec;
+}
 
 template <typename T>
-std::set<T> JsonToSet(std::string& data);
+std::set<T> JsonToSet(std::string& data) {
+    auto parsedData = json::parse(data);
+    std::set<T> set;
+    for (auto& [key, item] : parsedData.items()) {
+        set.insert(item.template get<T>());
+    }
+    return set;
+}
 
 json IntVectorToJson(const std::vector<int>& data);
 json IntSetToJson(const std::set<int>& data);
@@ -61,6 +76,8 @@ class Runner {
         std::function<void(int, bool)> m_onBooleanValueChange;
         std::function<void(int, std::vector<float>)> m_onMultipleNumericValuesChange;
         std::function<void(int)> m_onClick;
+
+        std::shared_ptr<CallbackHandler> m_callbackHandler;
 
         static Runner* instance;
 
@@ -85,15 +102,7 @@ class Runner {
 
         static void OnClick(int id);
 
-        void SetHandlers(
-            OnInitCb onInit,
-            OnTextChangedCb onTextChanged,
-            OnComboChangedCb onComboChanged,
-            OnNumericValueChangedCb onNumericValueChanged,
-            OnBooleanValueChangedCb onBooleanValueChanged,
-            OnMultipleNumericValuesChangedCb onMultipleNumericValuesChanged,
-            OnClickCb onClick
-            );
+        void SetHandlers(std::shared_ptr<CallbackHandler> handler);
 
         void SetRawFontDefs(std::string rawFontDefs);
 

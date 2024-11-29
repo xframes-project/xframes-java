@@ -1,3 +1,4 @@
+#include "callbacks-handler.h"
 #ifndef XFRAMES_WRAPPER_H
 #define XFRAMES_WRAPPER_H
 
@@ -10,22 +11,6 @@
 extern "C" {
 #endif
 
-/**
- *
-    * {
-        // Convert the Java string into a UTF-8 C string
-        const char *element = (*env)->GetStringUTFChars(env, elementJson, NULL);
-
-        // Print the string in C
-        printf("Received element: %s\n", element);
-
-        // Release the memory allocated for the C string
-        (*env)->ReleaseStringUTFChars(env, elementJson, element);
-    }
- *
- * @param width
- * @param height
- */
 void Java_dev_xframes_XFramesWrapper_resizeWindow(JNIEnv *env, jobject obj, jint width, jint height) {
     Runner* pRunner = Runner::getInstance();
     pRunner->ResizeWindow(width, height);
@@ -82,10 +67,14 @@ void Java_dev_xframes_XFramesWrapper_appendChild(JNIEnv *env, jobject obj, jint 
     pRunner->AppendChild(parentId, childId);
 }
 
-jstring Java_dev_xframes_XFramesWrapper_getChildren(int id) {
+jstring Java_dev_xframes_XFramesWrapper_getChildren(JNIEnv* env, jobject obj, jint id) {
     Runner* pRunner = Runner::getInstance();
 
-    return IntVectorToJson(pRunner->GetChildren(id)).dump().c_str();
+    // Convert the result of GetChildren(id) to a JSON string
+    std::string jsonString = IntVectorToJson(pRunner->GetChildren(id)).dump();
+
+    // Convert std::string to a jstring and return it
+    return env->NewStringUTF(jsonString.c_str());
 }
 
 void Java_dev_xframes_XFramesWrapper_appendTextToClippedMultiLineTextRenderer(JNIEnv *env, jobject obj, jint id, jstring dataJString) {
@@ -99,10 +88,14 @@ void Java_dev_xframes_XFramesWrapper_appendTextToClippedMultiLineTextRenderer(JN
     env->ReleaseStringUTFChars(dataJString, dataCStr);
 }
 
-jstring Java_dev_xframes_XFramesWrapper_getStyle() {
+jstring Java_dev_xframes_XFramesWrapper_getStyle(JNIEnv* env, jobject obj) {
     Runner* pRunner = Runner::getInstance();
 
-    return pRunner->GetStyle().c_str();
+    // Get the style as a std::string (assuming GetStyle returns a std::string)
+    std::string styleString = pRunner->GetStyle();
+
+    // Convert the std::string to a jstring and return it
+    return env->NewStringUTF(styleString.c_str());
 }
 
 void Java_dev_xframes_XFramesWrapper_patchStyle(JNIEnv *env, jobject obj, jstring styleDefJString) {
@@ -128,18 +121,6 @@ void Java_dev_xframes_XFramesWrapper_showDebugWindow(JNIEnv *env, jobject obj) {
     pRunner->ShowDebugWindow();
 }
 
-/**
- * [0] assets base path
- * [1] raw font definitions (stringified JSON)
- * [2] raw style override definitions (stringified JSON)
- * [3] onInit function
- * [4] onTextChanged function
- * [5] onComboChanged function
- * [6] onNumericValueChanged function
- * [7] OnBooleanValueChanged function
- * [8] OnMultipleNumericValuesChanged function
- * [9] OnClick function
- */
 void Java_dev_xframes_XFramesWrapper_init(JNIEnv *env, jobject obj,
        jstring assetsBasePath,
        jstring rawFontDefinitions,
@@ -149,25 +130,25 @@ void Java_dev_xframes_XFramesWrapper_init(JNIEnv *env, jobject obj,
     Runner* pRunner = Runner::getInstance();
 
     // Convert the Java strings to C strings
-    const char* assetsBasePathStr = (*env)->GetStringUTFChars(env, assetsBasePath, 0);
-    const char* rawFontDefinitionsStr = (*env)->GetStringUTFChars(env, rawFontDefinitions, 0);
-    const char* rawStyleOverrideDefinitionsStr = (*env)->GetStringUTFChars(env, rawStyleOverrideDefinitions, 0);
+    const char* assetsBasePathStr = env->GetStringUTFChars(assetsBasePath, nullptr);
+    const char* rawFontDefinitionsStr = env->GetStringUTFChars(rawFontDefinitions, nullptr);
+    const char* rawStyleOverrideDefinitionsStr = env->GetStringUTFChars(rawStyleOverrideDefinitions, nullptr);
 
     pRunner->SetAssetsBasePath(assetsBasePathStr);
     pRunner->SetRawFontDefs(rawFontDefinitionsStr);
     pRunner->SetRawStyleOverridesDefs(rawStyleOverrideDefinitionsStr);
 
-    pRunner->SetHandlers(allCallbacks);
+    env->ReleaseStringUTFChars(assetsBasePath, assetsBasePathStr);
+    env->ReleaseStringUTFChars(rawFontDefinitions, rawFontDefinitionsStr);
+    env->ReleaseStringUTFChars(rawStyleOverrideDefinitions, rawStyleOverrideDefinitionsStr);
+
+    // Create a shared pointer to manage the CallbackHandler's lifecycle
+    auto handler = std::make_shared<CallbackHandler>(env, allCallbacks);
+
+    // Pass the handler to SetHandlers
+    pRunner->SetHandlers(handler);
 
     pRunner->Init();
-
-    // Don't forget to release the strings
-    (*env)->ReleaseStringUTFChars(env, assetsBasePath, assetsBasePathStr);
-    (*env)->ReleaseStringUTFChars(env, rawFontDefinitions, rawFontDefinitionsStr);
-    (*env)->ReleaseStringUTFChars(env, rawStyleOverrideDefinitions, rawStyleOverrideDefinitionsStr);
-
-    // uiThread = std::thread(run);
-    // uiThread.detach();
 }
 
 #ifdef __cplusplus

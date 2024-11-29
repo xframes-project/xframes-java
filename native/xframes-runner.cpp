@@ -1,29 +1,10 @@
 
 #include <nlohmann/json.hpp>
 
+#include "callbacks-handler.h"
 #include "xframes-runner.h"
 
 using json = nlohmann::json;
-
-template <typename T>
-std::vector<T> JsonToVector(std::string& data) {
-    auto parsedData = json::parse(data);
-    std::vector<T> vec;
-    for (auto& [key, item] : parsedData.items()) {
-        vec.push_back(item.template get<T>());
-    }
-    return vec;
-}
-
-template <typename T>
-std::set<T> JsonToSet(std::string& data) {
-    auto parsedData = json::parse(data);
-    std::set<T> set;
-    for (auto& [key, item] : parsedData.items()) {
-        set.insert(item.template get<T>());
-    }
-    return set;
-}
 
 json IntVectorToJson(const std::vector<int>& data) {
     auto jsonArray = json::array();
@@ -91,21 +72,17 @@ void Runner::OnClick(int id) {
 };
 
 void Runner::SetHandlers(
-    OnInitCb onInit,
-    OnTextChangedCb onTextChanged,
-    OnComboChangedCb onComboChanged,
-    OnNumericValueChangedCb onNumericValueChanged,
-    OnBooleanValueChangedCb onBooleanValueChanged,
-    OnMultipleNumericValuesChangedCb onMultipleNumericValuesChanged,
-    OnClickCb onClick
+std::shared_ptr<CallbackHandler> callbackHandler
     ) {
-        m_onInit = [onInit](){ onInit(); };
-        m_onTextChange = [onTextChanged](int id, const std::string& value){ onTextChanged(id, value.c_str()); };
-        m_onComboChange = [onComboChanged](int id, int value){ onComboChanged(id, value); };
-        m_onNumericValueChange = [onNumericValueChanged](int id, float value){ onNumericValueChanged(id, value); };
-        m_onBooleanValueChange = [onBooleanValueChanged](int id, bool value){ onBooleanValueChanged(id, value); };
-        m_onMultipleNumericValuesChange = [onMultipleNumericValuesChanged](int id, std::vector<float> values){ onMultipleNumericValuesChanged(id, values.data(), (int)values.size()); };
-        m_onClick = [onClick](int id){ onClick(id); };
+        m_callbackHandler = callbackHandler;
+
+        m_onInit = [this](){ m_callbackHandler->onInit(); };
+        m_onTextChange = [this](int id, const std::string& value){ m_callbackHandler->onTextChanged(id, value.c_str()); };
+        m_onComboChange = [this](int id, int value){ m_callbackHandler->onComboChanged(id, value); };
+        m_onNumericValueChange = [this](int id, float value){ m_callbackHandler->onNumericValueChanged(id, value); };
+        m_onBooleanValueChange = [this](int id, bool value){ m_callbackHandler->onBooleanValueChanged(id, value); };
+        m_onMultipleNumericValuesChange = [this](int id, std::vector<float> values){ m_callbackHandler->onMultipleNumericValuesChanged(id, values.data(), (int)values.size()); };
+        m_onClick = [this](int id){ m_callbackHandler->onClick(id); };
 };
 
 void Runner::SetRawFontDefs(std::string rawFontDefs) {
@@ -268,4 +245,4 @@ void Runner::ShowDebugWindow() {
     m_xframes->ShowDebugWindow();
 };
 
-
+Runner* Runner::instance = nullptr;

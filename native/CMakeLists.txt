@@ -6,6 +6,8 @@ set(CMAKE_TOOLCHAIN_FILE "./vcpkg/scripts/buildsystems/vcpkg.cmake")
 
 project(xframesjni C CXX)
 
+set(CMAKE_CXX_STANDARD 20)
+
 # Specify the library version
 set(MYLIBRARY_VERSION_MAJOR 0)
 set(MYLIBRARY_VERSION_MINOR 0)
@@ -89,6 +91,8 @@ set(SOURCES
 
         xframes-runner.cpp
         xframes-wrapper.cpp
+        callbacks-handler.h
+        callbacks-handler.cpp
 )
 
 find_package(Java REQUIRED)
