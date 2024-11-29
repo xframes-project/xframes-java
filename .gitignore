@@ -26,3 +26,5 @@ replay_pid*
 build
 .idea
 .out
+cmake-build-release-visual-studio
+
