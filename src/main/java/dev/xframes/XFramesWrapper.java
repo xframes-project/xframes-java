@@ -49,8 +49,6 @@ public class XFramesWrapper {
     }
 
     public static void main(String[] args) {
-        System.out.println(getFontDefinitions());
-
         var xframes = new XFramesWrapper();
         var allCallbacks = MyCallbackHandler.getInstance(xframes);
 
