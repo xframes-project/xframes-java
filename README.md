@@ -51,4 +51,9 @@ No need to run batch/bash files if you already installed gradle globally
 
 java -Djava.library.path=./native/build/Debug -cp "build/classes/java/main;~/.m2/repository/org/json/json/20201115/json-20201115.jar" dev.xframes.XFramesWrapper
 
+### Screenshots
+
+Java, OpenJDK 23, Windows 11
+
+![image](https://github.com/user-attachments/assets/87c63d02-0ec9-4333-ae0e-ccb285d76493)
 
