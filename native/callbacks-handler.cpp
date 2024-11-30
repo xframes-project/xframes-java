@@ -66,6 +66,11 @@ void CallbackHandler::onTextChanged(int id, const char* text) {
         jstring jText = m_env->NewStringUTF(text);
         m_env->CallVoidMethod(m_callbacks, onTextChangedMethod, id, jText);
         m_env->DeleteLocalRef(jText);  // Delete local reference to the string
+
+        if (m_env->ExceptionCheck()) {
+            m_env->ExceptionDescribe();
+            m_env->ExceptionClear();
+        }
     }
 }
 
@@ -74,6 +79,11 @@ void CallbackHandler::onComboChanged(int id, int value) {
     jmethodID onComboChangedMethod = m_env->GetMethodID(callbackClass, "onComboChanged", "(II)V");
     if (onComboChangedMethod != NULL) {
         m_env->CallVoidMethod(m_callbacks, onComboChangedMethod, id, value);
+
+        if (m_env->ExceptionCheck()) {
+            m_env->ExceptionDescribe();
+            m_env->ExceptionClear();
+        }
     }
 }
 
@@ -82,6 +92,11 @@ void CallbackHandler::onNumericValueChanged(int id, float value) {
     jmethodID onNumericValueChangedMethod = m_env->GetMethodID(callbackClass, "onNumericValueChanged", "(IF)V");
     if (onNumericValueChangedMethod != NULL) {
         m_env->CallVoidMethod(m_callbacks, onNumericValueChangedMethod, id, value);
+
+        if (m_env->ExceptionCheck()) {
+            m_env->ExceptionDescribe();
+            m_env->ExceptionClear();
+        }
     }
 }
 
@@ -90,6 +105,11 @@ void CallbackHandler::onBooleanValueChanged(int id, bool value) {
     jmethodID onBooleanValueChangedMethod = m_env->GetMethodID(callbackClass, "onBooleanValueChanged", "(IZ)V");
     if (onBooleanValueChangedMethod != NULL) {
         m_env->CallVoidMethod(m_callbacks, onBooleanValueChangedMethod, id, value ? JNI_TRUE : JNI_FALSE);
+
+        if (m_env->ExceptionCheck()) {
+            m_env->ExceptionDescribe();
+            m_env->ExceptionClear();
+        }
     }
 }
 
@@ -101,6 +121,11 @@ void CallbackHandler::onMultipleNumericValuesChanged(int id, float* values, int 
         m_env->SetFloatArrayRegion(jValues, 0, numValues, values);
         m_env->CallVoidMethod(m_callbacks, onMultipleNumericValuesChangedMethod, id, jValues);
         m_env->DeleteLocalRef(jValues);  // Delete local reference to the array
+
+        if (m_env->ExceptionCheck()) {
+            m_env->ExceptionDescribe();
+            m_env->ExceptionClear();
+        }
     }
 }
 

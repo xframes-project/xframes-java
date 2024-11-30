@@ -28,7 +28,7 @@ public:
     void onBooleanValueChanged(int id, bool value);
 
     // onMultipleNumericValuesChanged callback
-    void onMultipleNumericValuesChanged(int id, float* values, int numValues);
+    void onMultipleNumericValuesChanged(int id, float* values);
 
     // onClick callback
     void onClick(int id);

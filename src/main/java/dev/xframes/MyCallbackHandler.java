@@ -66,10 +66,10 @@ public class MyCallbackHandler implements AllCallbacks {
     }
 
     @Override
-    public void onMultipleNumericValuesChanged(int id, float[] values, int numValues) {
+    public void onMultipleNumericValuesChanged(int id, float[] values) {
         System.out.print("Multiple numeric values changed (ID: " + id + ", Values: ");
-        for (int i = 0; i < numValues; i++) {
-            System.out.print(values[i] + " ");
+        for (float value : values) {
+            System.out.print(value + " ");
         }
         System.out.println(")");
     }
