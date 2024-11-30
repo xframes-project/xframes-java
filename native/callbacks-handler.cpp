@@ -12,21 +12,23 @@ CallbackHandler::~CallbackHandler() {
     m_env->DeleteGlobalRef(m_callbacks);
     m_env->DeleteGlobalRef(m_xframes);
 
-    m_jvm->DetachCurrentThread();
+    // Only detach if the thread is actually attached
+    JNIEnv* env;
+    if (m_jvm->GetEnv((void**)&env, JNI_VERSION_1_6) == JNI_OK) {
+        m_jvm->DetachCurrentThread();
+    }
 };
 
 void CallbackHandler::onInit() {
     jint res = m_jvm->AttachCurrentThread((void**)&m_env, nullptr);
     if (res != JNI_OK) {
-        printf("Error: Unable to attach thread to JVM\n");
+        fprintf(stderr, "Error: Unable to attach thread to JVM\n");
         return;
     }
 
     jclass callbackClasss = m_env->FindClass("dev/xframes/MyCallbackHandler");
     if (callbackClasss == nullptr) {
-        printf("000\n");
         m_env->ExceptionDescribe();
-        printf("azzo\n");
         return;
     }
 
