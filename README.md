@@ -12,7 +12,11 @@
 
 ### Prerequisites
 
-The JNI DLL requires the following dependencies to be in your system PATH
+The JNI DLL requires the generated DLL files to be in your system PATH.
+
+On Windows:
+- fmt.dll (fmtd.dll in Debug mode)
+- glfw3.dll
 
 #### Windows
 Temporary (Command Prompt):
