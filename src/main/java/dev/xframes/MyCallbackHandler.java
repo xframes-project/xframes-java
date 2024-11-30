@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 public class MyCallbackHandler implements AllCallbacks {
 
-    private static MyCallbackHandler instance;
+    private static volatile MyCallbackHandler instance;
     private final XFramesWrapper xframes;
 
     private MyCallbackHandler(XFramesWrapper xframes) {

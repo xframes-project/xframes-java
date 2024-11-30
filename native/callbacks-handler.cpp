@@ -10,6 +10,7 @@ CallbackHandler::CallbackHandler(JavaVM* jvm, JNIEnv* env, jobject xframes, jobj
 CallbackHandler::~CallbackHandler() {
     // Release the global reference when done
     m_env->DeleteGlobalRef(m_callbacks);
+    m_env->DeleteGlobalRef(m_xframes);
 
     m_jvm->DetachCurrentThread();
 };

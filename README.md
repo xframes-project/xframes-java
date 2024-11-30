@@ -12,12 +12,17 @@
 
 ### Prerequisites
 
-The JNI DLL depends on other DLLs, which must be discoverable by adding them to Path/PATH
+The JNI DLL requires the following dependencies to be in your system PATH
 
-on Windows, in a terminal:
+#### Windows
+Temporary (Command Prompt):
+`set PATH=%PATH%;C:\path\to\dlls\folder`
 
-`set PATH=%PATH%;</path/to/dlls/folder>`
+Temporary (PowerShell):
+`$env:PATH += ";C:\path\to\dlls\folder"`
 
+#### Linux/macOS
+`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/dlls/folder`
 
 ### With Gradle
 
