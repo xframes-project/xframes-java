@@ -8,7 +8,7 @@
 `cmake -S . build`
 `cmake --build build`
 
-## Run the app
+## Running the app
 
 ### Prerequisites
 
@@ -30,7 +30,20 @@ Temporary (PowerShell):
 
 ### With Gradle
 
-`gradle runMain`
+No need to run batch/bash files if you already installed gradle globally
+
+#### On Windows
+
+`.\gradlew.bat runMain`
+
+#### On Linux/macOS
+
+`./gradlew runMain`
+
+#### Additional build options
+
+`./gradlew runMain --info`    # For detailed build information
+`./gradlew clean runMain`     # For clean build
 
 ### Without Gradle
 
