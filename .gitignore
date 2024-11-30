@@ -23,6 +23,9 @@
 hs_err_pid*
 replay_pid*
 
+.gradle
 build
 .idea
 .out
+cmake-build-release-visual-studio
+

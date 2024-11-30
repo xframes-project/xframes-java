@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.json:json:20210307' // Use the latest version
+}
+
+// todo: include DLLs
+// todo: figure out how to dynamically amend system path so that dependent DLLs can be loaded correctly
+application {
+    mainClass = 'dev.xframes.XFramesWrapper'
+    applicationDefaultJvmArgs = ['-Djava.library.path=./']
+//    executableDir = 'custom_bin_dir'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+task runMain(type: JavaExec) {
+    mainClass = 'dev.xframes.XFramesWrapper'
+    classpath = sourceSets.main.runtimeClasspath
+    args = []
+    // todo: ensure DLLs are moved to a consistent path across operating systems
+    jvmArgs = ['-Djava.library.path=./native/build/Debug']
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'dev.xframes.XFramesWrapper'
+    }
+}
