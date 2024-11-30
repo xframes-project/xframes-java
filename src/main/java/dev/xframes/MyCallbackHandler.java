@@ -1,18 +1,48 @@
 package dev.xframes;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class MyCallbackHandler implements AllCallbacks {
 
+    private static MyCallbackHandler instance;
     private final XFramesWrapper xframes;
 
-    public MyCallbackHandler(XFramesWrapper xframes) {
+    private MyCallbackHandler(XFramesWrapper xframes) {
         this.xframes = xframes;
+    }
+
+    public static MyCallbackHandler getInstance(XFramesWrapper xframes) {
+        if (instance == null) {
+            synchronized (MyCallbackHandler.class) { // Thread-safe singleton initialization
+                if (instance == null) {
+                    instance = new MyCallbackHandler(xframes);
+                }
+            }
+        }
+        return instance;
     }
 
     @Override
     public void onInit() {
         System.out.println("Initialization callback called!");
 
-        this.xframes.setElement("{\"type\":\"button\", \"label\":\"Click Me\"}");
+        // Create root node
+        JSONObject rootNode = new JSONObject();
+        rootNode.put("id", 0);
+        rootNode.put("type", "node");
+        rootNode.put("root", true);
+
+        // Create text node
+        JSONObject textNode = new JSONObject();
+        textNode.put("id", 1);
+        textNode.put("type", "unformatted-text");
+        textNode.put("text", "Hello, world!");
+
+        // Set elements
+        xframes.setElement(rootNode.toString());
+        xframes.setElement(textNode.toString());
+        xframes.setChildren(0, new JSONArray().put(1).toString());
     }
 
     @Override

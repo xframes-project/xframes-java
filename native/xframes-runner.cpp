@@ -1,5 +1,7 @@
+#include <thread>
 
 #include <nlohmann/json.hpp>
+#include <utility>
 
 #include "callbacks-handler.h"
 #include "xframes-runner.h"
@@ -71,12 +73,12 @@ void Runner::OnClick(int id) {
     pRunner->m_onClick(id);
 };
 
-void Runner::SetHandlers(
-std::shared_ptr<CallbackHandler> callbackHandler
-    ) {
-        m_callbackHandler = callbackHandler;
+void Runner::SetHandlers(CallbackHandler& callbackHandler) {
+        m_callbackHandler = std::make_unique<CallbackHandler>(std::move(callbackHandler));
 
-        m_onInit = [this](){ m_callbackHandler->onInit(); };
+        m_onInit = [this]() {
+            m_callbackHandler->onInit();
+        };
         m_onTextChange = [this](int id, const std::string& value){ m_callbackHandler->onTextChanged(id, value.c_str()); };
         m_onComboChange = [this](int id, int value){ m_callbackHandler->onComboChanged(id, value); };
         m_onNumericValueChange = [this](int id, float value){ m_callbackHandler->onNumericValueChanged(id, value); };
@@ -122,6 +124,11 @@ void Runner::Init() {
 
 void Runner::Run() {
     m_renderer->Init();
+};
+
+void Runner::StartThread() {
+    std::thread runnerThread(&Runner::Run, this);
+    runnerThread.detach();  // Detach the thread to run independently
 };
 
 void Runner::Exit() {

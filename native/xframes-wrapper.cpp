@@ -1,22 +1,27 @@
-#include "callbacks-handler.h"
-#ifndef XFRAMES_WRAPPER_H
-#define XFRAMES_WRAPPER_H
-
 #include <string>
 #include <jni.h>
-#include <xframes-wrapper.h>
-#include <xframes-runner.h>
+#include "callbacks-handler.h"
+#include "xframes-wrapper.h"
+#include "xframes-runner.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void Java_dev_xframes_XFramesWrapper_resizeWindow(JNIEnv *env, jobject obj, jint width, jint height) {
+JavaVM* g_jvm = nullptr;
+jobject g_wrapper = nullptr;
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved) {
+    g_jvm = jvm;  // Save the JVM instance
+    return JNI_VERSION_1_6;  // Return JNI version
+}
+
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_resizeWindow(JNIEnv *env, jobject obj, jint width, jint height) {
     Runner* pRunner = Runner::getInstance();
     pRunner->ResizeWindow(width, height);
 }
 
-void Java_dev_xframes_XFramesWrapper_setElement(JNIEnv *env, jobject obj, jstring elementJsonJString) {
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_setElement(JNIEnv *env, jobject obj, jstring elementJsonJString) {
     Runner* pRunner = Runner::getInstance();
 
     const char* elementJsonCStr = env->GetStringUTFChars(elementJsonJString, nullptr);
@@ -28,7 +33,7 @@ void Java_dev_xframes_XFramesWrapper_setElement(JNIEnv *env, jobject obj, jstrin
     env->ReleaseStringUTFChars(elementJsonJString, elementJsonCStr);
 }
 
-void Java_dev_xframes_XFramesWrapper_patchElement(JNIEnv *env, jobject obj, jint id, jstring elementJsonJString) {
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_patchElement(JNIEnv *env, jobject obj, jint id, jstring elementJsonJString) {
     Runner* pRunner = Runner::getInstance();
     const char* elementJsonCStr = env->GetStringUTFChars(elementJsonJString, nullptr);
 
@@ -39,7 +44,7 @@ void Java_dev_xframes_XFramesWrapper_patchElement(JNIEnv *env, jobject obj, jint
     env->ReleaseStringUTFChars(elementJsonJString, elementJsonCStr);
 }
 
-void Java_dev_xframes_XFramesWrapper_elementInternalOp(JNIEnv *env, jobject obj, jint id, jstring elementJsonJString) {
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_elementInternalOp(JNIEnv *env, jobject obj, jint id, jstring elementJsonJString) {
     Runner* pRunner = Runner::getInstance();
     const char* elementJsonCStr = env->GetStringUTFChars(elementJsonJString, nullptr);
 
@@ -50,7 +55,7 @@ void Java_dev_xframes_XFramesWrapper_elementInternalOp(JNIEnv *env, jobject obj,
     env->ReleaseStringUTFChars(elementJsonJString, elementJsonCStr);
 }
 
-void Java_dev_xframes_XFramesWrapper_setChildren(JNIEnv *env, jobject obj, jint id, jstring childrenIdsJString) {
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_setChildren(JNIEnv *env, jobject obj, jint id, jstring childrenIdsJString) {
     Runner* pRunner = Runner::getInstance();
     const char* childrenIdsCStr = env->GetStringUTFChars(childrenIdsJString, nullptr);
 
@@ -61,13 +66,13 @@ void Java_dev_xframes_XFramesWrapper_setChildren(JNIEnv *env, jobject obj, jint 
     env->ReleaseStringUTFChars(childrenIdsJString, childrenIdsCStr);
 }
 
-void Java_dev_xframes_XFramesWrapper_appendChild(JNIEnv *env, jobject obj, jint parentId, jint childId) {
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_appendChild(JNIEnv *env, jobject obj, jint parentId, jint childId) {
     Runner* pRunner = Runner::getInstance();
 
     pRunner->AppendChild(parentId, childId);
 }
 
-jstring Java_dev_xframes_XFramesWrapper_getChildren(JNIEnv* env, jobject obj, jint id) {
+JNIEXPORT jstring JNICALL Java_dev_xframes_XFramesWrapper_getChildren(JNIEnv* env, jobject obj, jint id) {
     Runner* pRunner = Runner::getInstance();
 
     // Convert the result of GetChildren(id) to a JSON string
@@ -77,7 +82,7 @@ jstring Java_dev_xframes_XFramesWrapper_getChildren(JNIEnv* env, jobject obj, ji
     return env->NewStringUTF(jsonString.c_str());
 }
 
-void Java_dev_xframes_XFramesWrapper_appendTextToClippedMultiLineTextRenderer(JNIEnv *env, jobject obj, jint id, jstring dataJString) {
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_appendTextToClippedMultiLineTextRenderer(JNIEnv *env, jobject obj, jint id, jstring dataJString) {
     Runner* pRunner = Runner::getInstance();
     const char* dataCStr = env->GetStringUTFChars(dataJString, nullptr);
 
@@ -88,7 +93,7 @@ void Java_dev_xframes_XFramesWrapper_appendTextToClippedMultiLineTextRenderer(JN
     env->ReleaseStringUTFChars(dataJString, dataCStr);
 }
 
-jstring Java_dev_xframes_XFramesWrapper_getStyle(JNIEnv* env, jobject obj) {
+JNIEXPORT jstring JNICALL Java_dev_xframes_XFramesWrapper_getStyle(JNIEnv* env, jobject obj) {
     Runner* pRunner = Runner::getInstance();
 
     // Get the style as a std::string (assuming GetStyle returns a std::string)
@@ -98,7 +103,7 @@ jstring Java_dev_xframes_XFramesWrapper_getStyle(JNIEnv* env, jobject obj) {
     return env->NewStringUTF(styleString.c_str());
 }
 
-void Java_dev_xframes_XFramesWrapper_patchStyle(JNIEnv *env, jobject obj, jstring styleDefJString) {
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_patchStyle(JNIEnv *env, jobject obj, jstring styleDefJString) {
     Runner* pRunner = Runner::getInstance();
     const char* styleDefCStr = env->GetStringUTFChars(styleDefJString, nullptr);
 
@@ -109,26 +114,25 @@ void Java_dev_xframes_XFramesWrapper_patchStyle(JNIEnv *env, jobject obj, jstrin
     env->ReleaseStringUTFChars(styleDefJString, styleDefCStr);
 }
 
-void Java_dev_xframes_XFramesWrapper_setDebug(JNIEnv *env, jobject obj, jboolean debug) {
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_setDebug(JNIEnv *env, jobject obj, jboolean debug) {
     Runner* pRunner = Runner::getInstance();
 
     pRunner->SetDebug(debug);
 }
 
-void Java_dev_xframes_XFramesWrapper_showDebugWindow(JNIEnv *env, jobject obj) {
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_showDebugWindow(JNIEnv *env, jobject obj) {
     Runner* pRunner = Runner::getInstance();
 
     pRunner->ShowDebugWindow();
 }
 
-void Java_dev_xframes_XFramesWrapper_init(JNIEnv *env, jobject obj,
+JNIEXPORT void JNICALL Java_dev_xframes_XFramesWrapper_init(JNIEnv *env, jobject obj,
        jstring assetsBasePath,
        jstring rawFontDefinitions,
        jstring rawStyleOverrideDefinitions,
        jobject allCallbacks
     ) {
     Runner* pRunner = Runner::getInstance();
-
     // Convert the Java strings to C strings
     const char* assetsBasePathStr = env->GetStringUTFChars(assetsBasePath, nullptr);
     const char* rawFontDefinitionsStr = env->GetStringUTFChars(rawFontDefinitions, nullptr);
@@ -138,21 +142,20 @@ void Java_dev_xframes_XFramesWrapper_init(JNIEnv *env, jobject obj,
     pRunner->SetRawFontDefs(rawFontDefinitionsStr);
     pRunner->SetRawStyleOverridesDefs(rawStyleOverrideDefinitionsStr);
 
-    env->ReleaseStringUTFChars(assetsBasePath, assetsBasePathStr);
-    env->ReleaseStringUTFChars(rawFontDefinitions, rawFontDefinitionsStr);
-    env->ReleaseStringUTFChars(rawStyleOverrideDefinitions, rawStyleOverrideDefinitionsStr);
-
-    // Create a shared pointer to manage the CallbackHandler's lifecycle
-    auto handler = std::make_shared<CallbackHandler>(env, allCallbacks);
+    CallbackHandler handler(g_jvm, env, obj, allCallbacks);
 
     // Pass the handler to SetHandlers
     pRunner->SetHandlers(handler);
 
     pRunner->Init();
+
+    pRunner->StartThread();
+    env->ReleaseStringUTFChars(assetsBasePath, assetsBasePathStr);
+    env->ReleaseStringUTFChars(rawFontDefinitions, rawFontDefinitionsStr);
+    env->ReleaseStringUTFChars(rawStyleOverrideDefinitions, rawStyleOverrideDefinitionsStr);
 }
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // XFRAMES_WRAPPER_H

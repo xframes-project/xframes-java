@@ -9,7 +9,7 @@
 
 class CallbackHandler {
 public:
-    CallbackHandler(JNIEnv* env, jobject callbacks);
+    CallbackHandler(JavaVM* jvm, JNIEnv* env, jobject xframes, jobject callbacks);
 
     ~CallbackHandler();
 
@@ -34,7 +34,9 @@ public:
     void onClick(int id);
 
 private:
+    JavaVM* m_jvm;
     JNIEnv* m_env;
+    jobject m_xframes;
     jobject m_callbacks;
 };
 

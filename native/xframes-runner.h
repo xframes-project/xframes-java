@@ -77,7 +77,7 @@ class Runner {
         std::function<void(int, std::vector<float>)> m_onMultipleNumericValuesChange;
         std::function<void(int)> m_onClick;
 
-        std::shared_ptr<CallbackHandler> m_callbackHandler;
+        std::unique_ptr<CallbackHandler> m_callbackHandler;
 
         static Runner* instance;
 
@@ -102,7 +102,7 @@ class Runner {
 
         static void OnClick(int id);
 
-        void SetHandlers(std::shared_ptr<CallbackHandler> handler);
+        void SetHandlers(CallbackHandler& callbackHandler);
 
         void SetRawFontDefs(std::string rawFontDefs);
 
@@ -113,6 +113,8 @@ class Runner {
         void Init();
 
         void Run();
+
+        void StartThread();
 
         void Exit();
 

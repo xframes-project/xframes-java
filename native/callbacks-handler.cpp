@@ -1,22 +1,59 @@
 #include "callbacks-handler.h"
 
-CallbackHandler::CallbackHandler(JNIEnv* env, jobject callbacks)
-    : m_env(env), m_callbacks(callbacks) {
+CallbackHandler::CallbackHandler(JavaVM* jvm, JNIEnv* env, jobject xframes, jobject callbacks)
+    : m_jvm(jvm), m_env(env) {
     // Keep a global reference to prevent GC from collecting it
     m_callbacks = env->NewGlobalRef(callbacks);
+    m_xframes = env->NewGlobalRef(xframes);
 };
 
 CallbackHandler::~CallbackHandler() {
     // Release the global reference when done
     m_env->DeleteGlobalRef(m_callbacks);
+
+    m_jvm->DetachCurrentThread();
 };
 
 void CallbackHandler::onInit() {
-    jclass callbackClass = m_env->GetObjectClass(m_callbacks);
-    jmethodID onInitMethod = m_env->GetMethodID(callbackClass, "onInit", "()V");
-    if (onInitMethod != NULL) {
-        m_env->CallVoidMethod(m_callbacks, onInitMethod);
+    jint res = m_jvm->AttachCurrentThread((void**)&m_env, nullptr);
+    if (res != JNI_OK) {
+        printf("Error: Unable to attach thread to JVM\n");
+        return;
     }
+
+    jclass callbackClasss = m_env->FindClass("dev/xframes/MyCallbackHandler");
+    if (callbackClasss == nullptr) {
+        printf("000\n");
+        m_env->ExceptionDescribe();
+        printf("azzo\n");
+        return;
+    }
+
+    // Get the method ID for the 'onInit' instance method
+    jmethodID onInitMethod = m_env->GetMethodID(callbackClasss, "onInit", "()V");
+    if (onInitMethod == nullptr) {
+        printf("onInit method not found\n");
+        m_env->ExceptionDescribe();
+        return;
+    }
+
+    // Now get the singleton instance of MyCallbackHandler
+    jmethodID getInstanceMethod = m_env->GetStaticMethodID(callbackClasss, "getInstance", "(Ldev/xframes/XFramesWrapper;)Ldev/xframes/MyCallbackHandler;");
+    if (getInstanceMethod == nullptr) {
+        printf("getInstance method not found\n");
+        m_env->ExceptionDescribe();
+        return;
+    }
+
+    // Call getInstance() to get the singleton instance
+    jobject callbackHandlerInstance = m_env->CallStaticObjectMethod(callbackClasss, getInstanceMethod, m_xframes);
+    if (callbackHandlerInstance == nullptr) {
+        printf("Failed to get MyCallbackHandler instance\n");
+        return;
+    }
+
+    // Call the onInit method on the singleton instance
+    m_env->CallVoidMethod(callbackHandlerInstance, onInitMethod);
 };
 
 void CallbackHandler::onTextChanged(int id, const char* text) {

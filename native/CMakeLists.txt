@@ -91,7 +91,6 @@ set(SOURCES
 
         xframes-runner.cpp
         xframes-wrapper.cpp
-        callbacks-handler.h
         callbacks-handler.cpp
 )
 
