@@ -1,8 +1,7 @@
 package dev.xframes;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class XFramesWrapper {
@@ -50,7 +49,7 @@ public class XFramesWrapper {
     }
 
     public static void main(String[] args) {
-        System.out.println(getStyleOverrides());
+        System.out.println(getFontDefinitions());
 
         var xframes = new XFramesWrapper();
         var allCallbacks = MyCallbackHandler.getInstance(xframes);
@@ -83,12 +82,28 @@ public class XFramesWrapper {
 
     private static String getFontDefinitions() {
         JSONObject fontDefs = new JSONObject();
-        fontDefs.put("defs", new Object[]{
-                new HashMap<String, Object>() {{
-                    put("name", "roboto-regular");
-                    put("sizes", new int[]{16, 18, 20, 24, 28, 32, 36, 48});
-                }}
-        });
+
+        List<Map<String, Object>> defs = new ArrayList<>();
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("name", "roboto-regular");
+        entry.put("sizes", Arrays.asList(16, 18, 20, 24, 28, 32, 36, 48));
+        defs.add(entry);
+
+        // Transform the font definitions to a flattened list of font objects with name and size
+        List<Map<String, Object>> flattenedDefs = new ArrayList<>();
+        for (Map<String, Object> fontEntry : defs) {
+            String fontName = (String) fontEntry.get("name");
+            List<Integer> sizes = (List<Integer>) fontEntry.get("sizes");
+
+            for (Integer size : sizes) {
+                Map<String, Object> fontDef = new HashMap<>();
+                fontDef.put("name", fontName);
+                fontDef.put("size", size);
+                flattenedDefs.add(fontDef);
+            }
+        }
+
+        fontDefs.put("defs", flattenedDefs);
 
         return fontDefs.toString();
     }
@@ -162,14 +177,6 @@ public class XFramesWrapper {
         colorMap.put(ImGuiCol.NavWindowingHighlight.value, "darkerGrey");
         colorMap.put(ImGuiCol.NavWindowingDimBg.value, "darkerGrey");
         colorMap.put(ImGuiCol.ModalWindowDimBg.value, "darkerGrey");
-
-        // Use the ImGuiCol enum to populate the color settings
-//        Map<String, Object[]> colors = new HashMap<>();
-//        for (ImGuiCol col : ImGuiCol.values()) {
-//            String colorName = String.valueOf(col.getValue());
-//            // You can replace the color values as needed. Here it's just an example.
-//            colors.put(colorName, new Object[]{"#000000", 1}); // Default color placeholder
-//        }
 
         theme2.put("colors", colorMap);
 
