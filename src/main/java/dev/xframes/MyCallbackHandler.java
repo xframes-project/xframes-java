@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 public class MyCallbackHandler implements AllCallbacks {
 
-    private static volatile MyCallbackHandler instance;
+    private static volatile MyCallbackHandler INSTANCE;
     private final XFramesWrapper xframes;
 
     private MyCallbackHandler(XFramesWrapper xframes) {
@@ -13,14 +13,14 @@ public class MyCallbackHandler implements AllCallbacks {
     }
 
     public static MyCallbackHandler getInstance(XFramesWrapper xframes) {
-        if (instance == null) {
+        if (INSTANCE == null) {
             synchronized (MyCallbackHandler.class) { // Thread-safe singleton initialization
-                if (instance == null) {
-                    instance = new MyCallbackHandler(xframes);
+                if (INSTANCE == null) {
+                    INSTANCE = new MyCallbackHandler(xframes);
                 }
             }
         }
-        return instance;
+        return INSTANCE;
     }
 
     @Override
