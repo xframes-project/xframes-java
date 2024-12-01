@@ -1,16 +1,8 @@
 # xframes-java
 
-## Building the JNI DLL
+## Prerequisites
 
-(You need to open a developer prompt on Windows)
-
-`cd native`
-`cmake -S . build`
-`cmake --build build`
-
-## Running the app
-
-### Prerequisites
+Either [download](https://github.com/xframes-project/xframes-jni-library/releases) or build the JNI DLL and dependent DLL files.
 
 The JNI DLL requires the generated DLL files to be in your system PATH.
 
