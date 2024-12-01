@@ -1,6 +1,0 @@
-[submodule "native/xframes"]
-	path = native/xframes
-	url = https://github.com/xframes-project/xframes.git
-[submodule "native/vcpkg"]
-	path = native/vcpkg
-	url = https://github.com/microsoft/vcpkg.git
