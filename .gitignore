@@ -28,4 +28,4 @@ build
 .idea
 .out
 cmake-build-release-visual-studio
-
+native

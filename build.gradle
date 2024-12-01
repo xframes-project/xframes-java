@@ -31,8 +31,7 @@ task runMain(type: JavaExec) {
     mainClass = 'dev.xframes.XFramesWrapper'
     classpath = sourceSets.main.runtimeClasspath
     args = []
-    // todo: ensure DLLs are moved to a consistent path across operating systems
-    jvmArgs = ['-Djava.library.path=./native/build/Debug']
+    jvmArgs = ['-Djava.library.path=./native']
 }
 
 jar {
